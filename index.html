@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENEM Power-Up: Missão Aprovação</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Ícones (Feather Icons) -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* --- NOVO: Sistema de Temas com Variáveis CSS --- */
+        :root {
+            --bg-primary: #f0f9ff; /* Azul muito claro */
+            --bg-secondary: #e0f2fe; /* Azul claro */
+            --card-bg: linear-gradient(145deg, #ffffff, #f7fafc);
+            --text-primary: #0c4a6e; /* Azul escuro */
+            --text-secondary: #374151; /* Cinza */
+            --text-accent: #4f46e5; /* Indigo */
+            --border-color: #e5e7eb;
+            --button-primary-bg: #4f46e5;
+            --button-primary-hover: #4338ca;
+            --legendary-border-gradient: linear-gradient(120deg, #f59e0b, #ef4444, #8b5cf6, #3b82f6, #f59e0b);
+            --legendary-card-bg: white;
+        }
+
+        .dark {
+            --bg-primary: #111827; /* Cinza muito escuro */
+            --bg-secondary: #0f172a; /* Azul noite */
+            --card-bg: linear-gradient(145deg, #1f2937, #111827);
+            --text-primary: #e5e7eb; /* Cinza claro */
+            --text-secondary: #9ca3af; /* Cinza */
+            --text-accent: #818cf8; /* Indigo claro */
+            --border-color: #374151;
+            --button-primary-bg: #6366f1;
+            --button-primary-hover: #4f46e5;
+            --legendary-border-gradient: linear-gradient(120deg, #f59e0b, #ef4444, #8b5cf6, #3b82f6, #f59e0b);
+            --legendary-card-bg: #1f2937;
+        }
+        /* --- FIM DO SISTEMA DE TEMAS --- */
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .main-container {
+            background: var(--bg-secondary);
+            transition: background-color 0.3s ease;
+        }
+
+        .legendary-card {
+            border: 3px solid transparent;
+            background: var(--card-bg) padding-box, var(--legendary-border-gradient) border-box;
+            background-size: 200% 200%;
+            animation: gradient-border-animation 4s linear infinite;
+            transition: background 0.3s ease;
+        }
+
+        @keyframes gradient-border-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .alternative-btn {
+            background-color: color-mix(in srgb, var(--card-bg), transparent 50%);
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+            transition: all 0.2s ease-in-out;
+        }
+        .alternative-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--text-accent);
+        }
+        .alternative-btn.correct {
+            background-color: #166534; color: white; border-color: #22c55e;
+        }
+        .alternative-btn.incorrect {
+            background-color: #991b1b; color: white; border-color: #ef4444;
+        }
+        .alternative-btn[disabled] { cursor: not-allowed; opacity: 0.7; }
+        
+        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-backdrop { background-color: rgba(0,0,0,0.8); }
+        
+        .review-filter-btn.active-filter { background-color: var(--button-primary-bg); color: white; }
+        
+        /* Estilo para o botão de tema */
+        #theme-toggle {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Botão de Tema Fixo -->
+    <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full shadow-lg">
+        <i id="theme-icon" data-feather="moon"></i>
+    </button>
+
+    <div id="app-container" class="min-h-screen flex flex-col items-center justify-center p-4 main-container">
+
+        <!-- TELA INICIAL (HOME) -->
+        <div id="home-screen" class="screen active text-center p-8 rounded-2xl shadow-2xl max-w-2xl w-full legendary-card">
+            <h1 class="text-5xl font-black mb-2" style="color: var(--text-primary);">ENEM Power-Up</h1>
+            <p class="text-xl mb-8 opacity-90" style="color: var(--text-secondary);">Sua jornada para a aprovação começa agora!</p>
+            
+            <div class="space-y-4">
+                <button id="start-quiz-btn" class="w-full text-white font-bold py-4 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style="background-color: var(--button-primary-bg);">
+                    Iniciar Novo Quiz
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="stats-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Estatísticas</button>
+                    <button id="review-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Revisar Questões</button>
+                </div>
+            </div>
+
+            <div class="mt-8 border-t-2 pt-6" style="border-color: var(--border-color);">
+                <label for="json-upload" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Carregue suas questões:</label>
+                <input type="file" id="json-upload" accept=".json" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold cursor-pointer" style="color: var(--text-secondary);"/>
+                <p id="file-status" class="text-sm mt-2" style="color: var(--text-secondary);">Nenhum arquivo carregado.</p>
+                <button id="how-to-json-btn" class="mt-4 text-sm underline" style="color: var(--text-accent);">Como formatar o arquivo JSON?</button>
+            </div>
+        </div>
+
+        <!-- TELA DO QUIZ -->
+        <div id="quiz-screen" class="screen p-6 md:p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
+             <!-- BOTÃO VOLTAR -->
+             <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
+                <i data-feather="x-circle" class="w-7 h-7"></i>
+            </button>
+             <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span id="question-counter" class="font-bold text-lg" style="color: var(--text-primary);"></span>
+                    <span id="question-area" class="ml-4 text-white px-3 py-1 text-sm font-semibold rounded-full" style="background-color: var(--button-primary-bg);"></span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i data-feather="award" class="w-6 h-6 text-yellow-400"></i>
+                    <span id="score" class="font-bold text-2xl" style="color: var(--text-primary);">0</span>
+                </div>
+            </div>
+            <div class="w-full rounded-full h-2.5 mb-6" style="background-color: var(--border-color);">
+                <div id="progress-bar" class="bg-yellow-500 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <div id="question-container" class="mb-6">
+                <p id="question-id" class="font-semibold text-sm mb-2" style="color: var(--text-secondary);"></p>
+                <p id="question-text" class="text-lg leading-relaxed" style="color: var(--text-primary);"></p>
+                <img id="question-image" src="" alt="Imagem da questão" class="mt-4 rounded-lg max-w-full h-auto mx-auto hidden">
+            </div>
+            <div id="alternatives-container" class="grid grid-cols-1 gap-3"></div>
+            <div class="mt-6 text-center">
+                <div id="feedback-message" class="h-8 mb-4 font-bold text-xl"></div>
+                <button id="next-question-btn" class="w-full md:w-1/2 text-white font-bold py-3 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg hidden" style="background-color: var(--button-primary-bg);">Próxima Questão</button>
+                <button id="finish-quiz-btn" class="w-full md:w-1/2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg hidden">Finalizar e Ver Resultados</button>
+            </div>
+        </div>
+
+        <!-- TELA DE ESTATÍSTICAS -->
+        <div id="stats-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-3xl w-full legendary-card relative">
+            <!-- BOTÃO VOLTAR -->
+            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
+                <i data-feather="x-circle" class="w-7 h-7"></i>
+            </button>
+            <h2 class="text-4xl font-black mb-6 text-center" style="color: var(--text-primary);">Suas Estatísticas</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center mb-8">
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
+                    <p class="text-4xl font-bold" id="stats-total-answered" style="color: var(--text-primary);">0</p>
+                    <p style="color: var(--text-secondary);">Questões Resolvidas</p>
+                </div>
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
+                    <p class="text-4xl font-bold text-green-500" id="stats-accuracy">0%</p>
+                    <p style="color: var(--text-secondary);">Acertos</p>
+                </div>
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
+                    <p class="text-4xl font-bold text-yellow-500" id="stats-streak">0</p>
+                    <p style="color: var(--text-secondary);">Sequência Atual</p>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold mb-4 text-center" style="color: var(--text-primary);">Desempenho por Área</h3>
+            <div id="area-stats-container" class="space-y-3"></div>
+        </div>
+
+        <!-- TELA DE REVISÃO -->
+        <div id="review-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
+            <!-- BOTÃO VOLTAR -->
+            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
+                <i data-feather="x-circle" class="w-7 h-7"></i>
+            </button>
+            <h2 class="text-4xl font-black mb-6 text-center" style="color: var(--text-primary);">Revisão de Questões</h2>
+            <div class="flex justify-center space-x-4 mb-6">
+                <button class="review-filter-btn" data-filter="all">Todas</button>
+                <button class="review-filter-btn" data-filter="correct">Corretas</button>
+                <button class="review-filter-btn" data-filter="incorrect">Incorretas</button>
+            </div>
+            <div id="review-container" class="space-y-6 max-h-[60vh] overflow-y-auto pr-4"></div>
+        </div>
+    </div>
+    
+    <!-- MODAL DE INSTRUÇÕES JSON -->
+    <div id="json-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
+        <div class="rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative legendary-card">
+            <button id="close-modal-btn" class="absolute top-4 right-4 z-10" style="color: var(--text-secondary);">
+                <i data-feather="x" class="w-8 h-8"></i>
+            </button>
+            <h3 class="text-3xl font-bold mb-4 text-yellow-400">Como Criar seu Arquivo JSON</h3>
+            <p class="mb-4" style="color: var(--text-secondary);">O arquivo deve ser um array de objetos, onde cada objeto representa uma questão.</p>
+            <div class="rounded-lg p-4 text-sm overflow-x-auto border" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+<pre><code class="language-json" style="color: var(--text-secondary);">
+[
+  {
+    "id": "ENEM 2023 - Q91",
+    "area": "Ciências da Natureza",
+    "enunciado": "...",
+    "imagem": "",
+    "alternativas": [...],
+    "respostaCorreta": "D"
+  }
+]
+</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURAÇÃO FIREBASE ---
+        // As variáveis __firebase_config e __app_id serão injetadas pelo ambiente.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let app, auth, db, userId;
+
+        // --- VARIÁVEIS GLOBAIS DO APP ---
+        let allQuestions = [];
+        let currentQuizQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let userHistory = [];
+
+        // --- SELETORES DE ELEMENTOS DOM ---
+        const screens = { home: document.getElementById('home-screen'), quiz: document.getElementById('quiz-screen'), stats: document.getElementById('stats-screen'), review: document.getElementById('review-screen') };
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const jsonUpload = document.getElementById('json-upload');
+        const fileStatus = document.getElementById('file-status');
+        const questionCounter = document.getElementById('question-counter');
+        const questionArea = document.getElementById('question-area');
+        const scoreDisplay = document.getElementById('score');
+        const progressBar = document.getElementById('progress-bar');
+        const questionId = document.getElementById('question-id');
+        const questionText = document.getElementById('question-text');
+        const questionImage = document.getElementById('question-image');
+        const alternativesContainer = document.getElementById('alternatives-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const finishQuizBtn = document.getElementById('finish-quiz-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const closeScreenBtns = document.querySelectorAll('.close-screen-btn');
+        const jsonModal = document.getElementById('json-modal');
+        const howToJsonBtn = document.getElementById('how-to-json-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // --- FUNÇÕES DE TEMA ---
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIcon.setAttribute('data-feather', 'sun');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIcon.setAttribute('data-feather', 'moon');
+            }
+            feather.replace();
+        };
+
+        const toggleTheme = () => {
+            const currentTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', currentTheme);
+            applyTheme(currentTheme);
+        };
+
+        // --- FUNÇÕES DE DADOS (FIREBASE) ---
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                return new Promise((resolve) => {
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            console.log("Usuário autenticado:", userId);
+                            await loadUserHistory();
+                            resolve();
+                        } else {
+                            // Tenta autenticação com token customizado, se disponível
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                try {
+                                    await signInWithCustomToken(auth, __initial_auth_token);
+                                } catch (error) {
+                                    console.error("Erro no signInWithCustomToken, tentando anônimo:", error);
+                                    await signInAnonymously(auth);
+                                }
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error("Erro ao inicializar o Firebase:", error);
+                // Fallback para localStorage se o Firebase falhar
+                userId = 'local';
+                loadUserHistory();
+            }
+        }
+
+        async function loadUserHistory() {
+            if (!userId) return;
+            // Se o Firebase falhou, usa localStorage
+            if (userId === 'local') {
+                userHistory = JSON.parse(localStorage.getItem('enemUserHistory_local')) || [];
+                return;
+            }
+            // Carrega do Firestore
+            const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/history`);
+            const querySnapshot = await getDocs(query(historyCollection));
+            userHistory = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            console.log(`${userHistory.length} registros de histórico carregados do Firestore.`);
+        }
+
+        async function saveAnswerToHistory(answerData) {
+            userHistory.push(answerData);
+            if (!userId) return;
+            if (userId === 'local') {
+                localStorage.setItem('enemUserHistory_local', JSON.stringify(userHistory));
+                return;
+            }
+            try {
+                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/history`);
+                await addDoc(historyCollection, answerData);
+            } catch (error) {
+                console.error("Erro ao salvar resposta no Firestore:", error);
+            }
+        }
+
+        // --- FUNÇÕES DO APP ---
+        const init = async () => {
+            // Aplica tema salvo
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+
+            // Inicializa Firebase e carrega dados
+            await initializeFirebase();
+            
+            // Carrega questões do localStorage (o banco de questões é local)
+            const storedQuestions = localStorage.getItem('enemQuestions');
+            if(storedQuestions) {
+                allQuestions = JSON.parse(storedQuestions);
+            }
+
+            updateHomeUI();
+            addEventListeners();
+            feather.replace();
+        };
+
+        const showScreen = (screenName) => {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenName].classList.add('active');
+        };
+
+        const updateHomeUI = () => {
+            if (allQuestions.length > 0) {
+                startQuizBtn.disabled = false;
+                fileStatus.textContent = `${allQuestions.length} questões carregadas. Pronto para começar!`;
+                fileStatus.style.color = '#22c55e';
+            } else {
+                startQuizBtn.disabled = true;
+                fileStatus.textContent = 'Nenhum arquivo carregado. Carregue um JSON para começar.';
+                fileStatus.style.color = 'var(--text-secondary)';
+            }
+        };
+
+        const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (Array.isArray(json) && json.length > 0) {
+                        allQuestions = json;
+                        localStorage.setItem('enemQuestions', JSON.stringify(allQuestions));
+                        updateHomeUI();
+                    } else { alert('Erro: O arquivo JSON está vazio ou em formato inválido.'); }
+                } catch (error) { alert('Erro ao ler o arquivo JSON. Verifique o formato.'); console.error(error); }
+            };
+            reader.readAsText(file);
+        };
+
+        const startQuiz = () => {
+            currentQuizQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
+            currentQuestionIndex = 0; score = 0; streak = 0;
+            displayQuestion();
+            showScreen('quiz');
+        };
+
+        const displayQuestion = () => {
+            feedbackMessage.textContent = '';
+            nextQuestionBtn.classList.add('hidden');
+            finishQuizBtn.classList.add('hidden');
+            alternativesContainer.innerHTML = '';
+            
+            const question = currentQuizQuestions[currentQuestionIndex];
+            const progress = ((currentQuestionIndex + 1) / currentQuizQuestions.length) * 100;
+
+            questionCounter.textContent = `Questão ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
+            scoreDisplay.textContent = score;
+            progressBar.style.width = `${progress}%`;
+            questionArea.textContent = question.area;
+            questionId.textContent = question.id;
+            questionText.textContent = question.enunciado;
+            
+            if (question.imagem && question.imagem.trim() !== "") {
+                questionImage.src = question.imagem;
+                questionImage.classList.remove('hidden');
+            } else {
+                questionImage.classList.add('hidden');
+            }
+
+            question.alternativas.forEach(alt => {
+                const button = document.createElement('button');
+                button.className = 'alternative-btn w-full text-left p-4 rounded-lg font-semibold';
+                button.dataset.letra = alt.letra;
+                button.innerHTML = `<span class="font-bold mr-3" style="color: var(--text-accent);">${alt.letra})</span> ${alt.texto}`;
+                button.addEventListener('click', selectAnswer);
+                alternativesContainer.appendChild(button);
+            });
+        };
+
+        const selectAnswer = (event) => {
+            const selectedButton = event.currentTarget;
+            const selectedAnswer = selectedButton.dataset.letra;
+            const question = currentQuizQuestions[currentQuestionIndex];
+            const correctAnswer = question.respostaCorreta;
+            const isCorrect = selectedAnswer === correctAnswer;
+
+            const allAlternatives = alternativesContainer.querySelectorAll('.alternative-btn');
+            allAlternatives.forEach(btn => btn.disabled = true);
+
+            const answerData = {
+                questionId: question.id, area: question.area, userAnswer: selectedAnswer,
+                correctAnswer: correctAnswer, isCorrect: isCorrect, timestamp: new Date().toISOString()
+            };
+            saveAnswerToHistory(answerData);
+
+            if (isCorrect) {
+                selectedButton.classList.add('correct');
+                feedbackMessage.textContent = 'Resposta Correta!';
+                feedbackMessage.style.color = '#4ade80';
+                score += 10; streak++;
+            } else {
+                selectedButton.classList.add('incorrect');
+                feedbackMessage.textContent = `Incorreto! A resposta era ${correctAnswer}.`;
+                feedbackMessage.style.color = '#f87171';
+                streak = 0;
+                const correctButton = alternativesContainer.querySelector(`[data-letra="${correctAnswer}"]`);
+                if(correctButton) correctButton.classList.add('correct');
+            }
+            
+            scoreDisplay.textContent = score;
+            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+                nextQuestionBtn.classList.remove('hidden');
+            } else {
+                finishQuizBtn.classList.remove('hidden');
+            }
+        };
+
+        const showStats = () => {
+             if (userHistory.length === 0) { alert("Você ainda não respondeu nenhuma questão."); return; }
+             const totalAnswered = userHistory.length;
+             const totalCorrect = userHistory.filter(h => h.isCorrect).length;
+             const accuracy = totalAnswered > 0 ? ((totalCorrect / totalAnswered) * 100).toFixed(1) : 0;
+             document.getElementById('stats-total-answered').textContent = totalAnswered;
+             document.getElementById('stats-accuracy').textContent = `${accuracy}%`;
+             
+             let currentStreak = 0;
+             for (let i = userHistory.length - 1; i >= 0; i--) {
+                 if (userHistory[i].isCorrect) { currentStreak++; } else { break; }
+             }
+             document.getElementById('stats-streak').textContent = currentStreak;
+
+             const areaStats = {};
+             userHistory.forEach(h => {
+                 if (!areaStats[h.area]) { areaStats[h.area] = { total: 0, correct: 0 }; }
+                 areaStats[h.area].total++;
+                 if (h.isCorrect) areaStats[h.area].correct++;
+             });
+
+             const areaContainer = document.getElementById('area-stats-container');
+             areaContainer.innerHTML = '';
+             Object.keys(areaStats).sort().forEach(area => {
+                 const stats = areaStats[area];
+                 const areaAccuracy = stats.total > 0 ? ((stats.correct / stats.total) * 100).toFixed(0) : 0;
+                 areaContainer.innerHTML += `
+                    <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold" style="color: var(--text-primary);">${area}</span>
+                            <span class="text-sm" style="color: var(--text-secondary);">${stats.correct}/${stats.total} (${areaAccuracy}%)</span>
+                        </div>
+                        <div class="w-full rounded-full h-2.5 mt-2" style="background-color: var(--border-color);">
+                            <div class="h-2.5 rounded-full" style="width: ${areaAccuracy}%; background-color: var(--button-primary-bg);"></div>
+                        </div>
+                    </div>`;
+             });
+             showScreen('stats');
+        };
+
+        const showReview = (filter = 'all') => {
+             if (userHistory.length === 0) { alert("Você ainda não respondeu nenhuma questão."); return; }
+             const reviewContainer = document.getElementById('review-container');
+             reviewContainer.innerHTML = '';
+             const filteredHistory = userHistory.filter(h => filter === 'all' || (filter === 'correct' ? h.isCorrect : !h.isCorrect)).reverse();
+             if (filteredHistory.length === 0) { reviewContainer.innerHTML = `<p class="text-center" style="color: var(--text-secondary);">Nenhuma questão encontrada.</p>`; }
+
+             filteredHistory.forEach(h => {
+                 const questionData = allQuestions.find(q => q.id === h.questionId);
+                 if (!questionData) return;
+                 const alternativesHtml = questionData.alternativas.map(alt => {
+                     let classes = 'pl-8 py-1';
+                     if (alt.letra === h.correctAnswer) classes += ' text-green-400 font-bold';
+                     if (alt.letra === h.userAnswer && !h.isCorrect) classes += ' text-red-400 line-through';
+                     return `<li class="${classes}" style="color: var(--text-secondary);">${alt.letra}) ${alt.texto}</li>`;
+                 }).join('');
+                 reviewContainer.innerHTML += `
+                    <div class="p-5 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
+                        <p class="font-bold text-sm" style="color: var(--text-accent);">${questionData.id} - ${questionData.area}</p>
+                        <p class="my-2" style="color: var(--text-primary);">${questionData.enunciado}</p>
+                        <ul class="list-none mt-3 text-sm">${alternativesHtml}</ul>
+                        <p class="mt-3 text-xs" style="color: var(--text-secondary); opacity: 0.7;">Respondido em: ${new Date(h.timestamp).toLocaleString('pt-BR')}</p>
+                    </div>`;
+             });
+             document.querySelectorAll('.review-filter-btn').forEach(btn => btn.classList.toggle('active-filter', btn.dataset.filter === filter));
+             showScreen('review');
+        };
+        
+        const addEventListeners = () => {
+            themeToggle.addEventListener('click', toggleTheme);
+            jsonUpload.addEventListener('change', handleFileUpload);
+            startQuizBtn.addEventListener('click', startQuiz);
+            nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
+            finishQuizBtn.addEventListener('click', showStats);
+            statsBtn.addEventListener('click', showStats);
+            reviewBtn.addEventListener('click', () => showReview());
+            document.querySelectorAll('.review-filter-btn').forEach(btn => btn.addEventListener('click', (e) => showReview(e.currentTarget.dataset.filter)));
+            closeScreenBtns.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
+            howToJsonBtn.addEventListener('click', () => jsonModal.style.display = 'flex');
+            closeModalBtn.addEventListener('click', () => jsonModal.style.display = 'none');
+            jsonModal.addEventListener('click', (e) => { if (e.target === jsonModal) jsonModal.style.display = 'none'; });
+        };
+
+        // --- INICIA O APP ---
+        init();
+    </script>
+</body>
+</html>
