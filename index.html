@@ -17,7 +17,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <style>
-        /* --- NOVO: Sistema de Temas com Variáveis CSS --- */
+        /* --- Sistema de Temas com Variáveis CSS --- */
         :root {
             --bg-primary: #f0f9ff; /* Azul muito claro */
             --bg-secondary: #e0f2fe; /* Azul claro */
@@ -99,10 +99,15 @@
         
         .review-filter-btn.active-filter { background-color: var(--button-primary-bg); color: white; }
         
-        /* Estilo para o botão de tema */
         #theme-toggle {
             background: var(--border-color);
             color: var(--text-primary);
+        }
+
+        textarea {
+            background-color: color-mix(in srgb, var(--bg-primary), #000 2%);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -130,16 +135,22 @@
             </div>
 
             <div class="mt-8 border-t-2 pt-6" style="border-color: var(--border-color);">
-                <label for="json-upload" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Carregue suas questões:</label>
+                <label for="json-upload" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Carregar arquivo JSON:</label>
                 <input type="file" id="json-upload" accept=".json" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold cursor-pointer" style="color: var(--text-secondary);"/>
                 <p id="file-status" class="text-sm mt-2" style="color: var(--text-secondary);">Nenhum arquivo carregado.</p>
-                <button id="how-to-json-btn" class="mt-4 text-sm underline" style="color: var(--text-accent);">Como formatar o arquivo JSON?</button>
+                
+                <div class="my-4 text-center text-sm" style="color: var(--text-secondary);">ou</div>
+
+                <label for="json-paste-area" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Cole o código JSON aqui:</label>
+                <textarea id="json-paste-area" rows="4" class="w-full p-2 border rounded-md text-sm" placeholder="[ { ... } ]"></textarea>
+                <button id="load-from-paste-btn" class="w-full mt-2 text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md" style="background-color: var(--button-primary-bg);">Carregar do Texto</button>
+
+                <button id="how-to-json-btn" class="mt-6 text-sm underline" style="color: var(--text-accent);">Como formatar o arquivo JSON?</button>
             </div>
         </div>
 
         <!-- TELA DO QUIZ -->
         <div id="quiz-screen" class="screen p-6 md:p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
-             <!-- BOTÃO VOLTAR -->
              <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
                 <i data-feather="x-circle" class="w-7 h-7"></i>
             </button>
@@ -171,7 +182,6 @@
 
         <!-- TELA DE ESTATÍSTICAS -->
         <div id="stats-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-3xl w-full legendary-card relative">
-            <!-- BOTÃO VOLTAR -->
             <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
                 <i data-feather="x-circle" class="w-7 h-7"></i>
             </button>
@@ -196,7 +206,6 @@
 
         <!-- TELA DE REVISÃO -->
         <div id="review-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
-            <!-- BOTÃO VOLTAR -->
             <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
                 <i data-feather="x-circle" class="w-7 h-7"></i>
             </button>
@@ -243,7 +252,6 @@
         import { getFirestore, collection, addDoc, getDocs, query, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURAÇÃO FIREBASE ---
-        // As variáveis __firebase_config e __app_id serão injetadas pelo ambiente.
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -262,6 +270,8 @@
         const startQuizBtn = document.getElementById('start-quiz-btn');
         const jsonUpload = document.getElementById('json-upload');
         const fileStatus = document.getElementById('file-status');
+        const jsonPasteArea = document.getElementById('json-paste-area');
+        const loadFromPasteBtn = document.getElementById('load-from-paste-btn');
         const questionCounter = document.getElementById('question-counter');
         const questionArea = document.getElementById('question-area');
         const scoreDisplay = document.getElementById('score');
@@ -311,18 +321,11 @@
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
                             userId = user.uid;
-                            console.log("Usuário autenticado:", userId);
                             await loadUserHistory();
                             resolve();
                         } else {
-                            // Tenta autenticação com token customizado, se disponível
                             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                try {
-                                    await signInWithCustomToken(auth, __initial_auth_token);
-                                } catch (error) {
-                                    console.error("Erro no signInWithCustomToken, tentando anônimo:", error);
-                                    await signInAnonymously(auth);
-                                }
+                                try { await signInWithCustomToken(auth, __initial_auth_token); } catch (error) { await signInAnonymously(auth); }
                             } else {
                                 await signInAnonymously(auth);
                             }
@@ -331,7 +334,6 @@
                 });
             } catch (error) {
                 console.error("Erro ao inicializar o Firebase:", error);
-                // Fallback para localStorage se o Firebase falhar
                 userId = 'local';
                 loadUserHistory();
             }
@@ -339,22 +341,18 @@
 
         async function loadUserHistory() {
             if (!userId) return;
-            // Se o Firebase falhou, usa localStorage
             if (userId === 'local') {
                 userHistory = JSON.parse(localStorage.getItem('enemUserHistory_local')) || [];
                 return;
             }
-            // Carrega do Firestore
             const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/history`);
             const querySnapshot = await getDocs(query(historyCollection));
             userHistory = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            console.log(`${userHistory.length} registros de histórico carregados do Firestore.`);
         }
 
         async function saveAnswerToHistory(answerData) {
             userHistory.push(answerData);
-            if (!userId) return;
-            if (userId === 'local') {
+            if (!userId || userId === 'local') {
                 localStorage.setItem('enemUserHistory_local', JSON.stringify(userHistory));
                 return;
             }
@@ -365,22 +363,26 @@
                 console.error("Erro ao salvar resposta no Firestore:", error);
             }
         }
-
+        
         // --- FUNÇÕES DO APP ---
+        const processAndLoadQuestions = (json) => {
+            if (Array.isArray(json) && json.length > 0) {
+                allQuestions = json;
+                localStorage.setItem('enemQuestions', JSON.stringify(allQuestions));
+                updateHomeUI();
+                return true;
+            }
+            return false;
+        }
+
         const init = async () => {
-            // Aplica tema salvo
             const savedTheme = localStorage.getItem('theme') || 'light';
             applyTheme(savedTheme);
-
-            // Inicializa Firebase e carrega dados
             await initializeFirebase();
-            
-            // Carrega questões do localStorage (o banco de questões é local)
             const storedQuestions = localStorage.getItem('enemQuestions');
             if(storedQuestions) {
                 allQuestions = JSON.parse(storedQuestions);
             }
-
             updateHomeUI();
             addEventListeners();
             feather.replace();
@@ -389,6 +391,7 @@
         const showScreen = (screenName) => {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
             screens[screenName].classList.add('active');
+            feather.replace(); // Garante que novos ícones (como o de fechar) sejam renderizados
         };
 
         const updateHomeUI = () => {
@@ -398,7 +401,7 @@
                 fileStatus.style.color = '#22c55e';
             } else {
                 startQuizBtn.disabled = true;
-                fileStatus.textContent = 'Nenhum arquivo carregado. Carregue um JSON para começar.';
+                fileStatus.textContent = 'Nenhum arquivo carregado.';
                 fileStatus.style.color = 'var(--text-secondary)';
             }
         };
@@ -410,14 +413,31 @@
             reader.onload = (e) => {
                 try {
                     const json = JSON.parse(e.target.result);
-                    if (Array.isArray(json) && json.length > 0) {
-                        allQuestions = json;
-                        localStorage.setItem('enemQuestions', JSON.stringify(allQuestions));
-                        updateHomeUI();
-                    } else { alert('Erro: O arquivo JSON está vazio ou em formato inválido.'); }
-                } catch (error) { alert('Erro ao ler o arquivo JSON. Verifique o formato.'); console.error(error); }
+                    if (!processAndLoadQuestions(json)) {
+                         alert('Erro: O arquivo JSON está vazio ou em formato inválido.');
+                    }
+                } catch (error) { alert('Erro ao ler o arquivo JSON. Verifique o formato.'); }
             };
             reader.readAsText(file);
+        };
+
+        const handlePasteLoad = () => {
+            const jsonText = jsonPasteArea.value;
+            if (!jsonText.trim()) {
+                alert('Por favor, cole o código JSON na área de texto.');
+                return;
+            }
+            try {
+                const json = JSON.parse(jsonText);
+                if (processAndLoadQuestions(json)) {
+                    jsonPasteArea.value = ''; // Limpa a área após o sucesso
+                    alert('Questões carregadas com sucesso a partir do texto!');
+                } else {
+                    alert('Erro: O JSON colado está vazio ou em formato inválido.');
+                }
+            } catch (error) {
+                alert('Erro de formato no JSON. Verifique o texto colado.');
+            }
         };
 
         const startQuiz = () => {
@@ -467,8 +487,7 @@
             const correctAnswer = question.respostaCorreta;
             const isCorrect = selectedAnswer === correctAnswer;
 
-            const allAlternatives = alternativesContainer.querySelectorAll('.alternative-btn');
-            allAlternatives.forEach(btn => btn.disabled = true);
+            alternativesContainer.querySelectorAll('.alternative-btn').forEach(btn => btn.disabled = true);
 
             const answerData = {
                 questionId: question.id, area: question.area, userAnswer: selectedAnswer,
@@ -569,6 +588,7 @@
         const addEventListeners = () => {
             themeToggle.addEventListener('click', toggleTheme);
             jsonUpload.addEventListener('change', handleFileUpload);
+            loadFromPasteBtn.addEventListener('click', handlePasteLoad);
             startQuizBtn.addEventListener('click', startQuiz);
             nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
             finishQuizBtn.addEventListener('click', showStats);
