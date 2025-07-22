@@ -221,27 +221,29 @@
     
     <!-- MODAL DE INSTRUÇÕES JSON -->
     <div id="json-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="rounded-2xl shadow-2xl max-w-3xl w-full p-8 relative legendary-card">
+        <div class="rounded-2xl shadow-2xl max-w-3xl w-full p-8 relative legendary-card flex flex-col max-h-[90vh]">
             <button id="close-modal-btn" class="absolute top-4 right-4 z-10" style="color: var(--text-secondary);">
                 <i data-feather="x" class="w-8 h-8"></i>
             </button>
-            <h3 class="text-3xl font-bold mb-4 text-yellow-400">Instruções para o JSON</h3>
-            <p class="mb-4" style="color: var(--text-secondary);">Para garantir que as questões sejam carregadas corretamente, especialmente ao usar uma IA, siga esta estrutura <strong class="text-red-400">RIGOROSAMENTE</strong>. Qualquer desvio pode causar erros.</p>
+            <h3 class="text-3xl font-bold mb-4 text-yellow-400 flex-shrink-0">Instruções para o JSON</h3>
             
-            <div class="text-left space-y-2 mb-4 text-sm" style="color: var(--text-secondary);">
-                <p>O arquivo deve ser um <strong>Array</strong> (iniciando com <code>[</code> e terminando com <code>]</code>) contendo múltiplos <strong>Objetos</strong> de questão (entre <code>{</code> e <code>}</code>).</p>
-                <p><strong>Estrutura de cada Objeto de Questão:</strong></p>
-                <ul class="list-disc list-inside space-y-1 pl-4">
-                    <li><code>id</code> (String): Identificador único. Ex: "ENEM 2023 - Q91".</li>
-                    <li><code>area</code> (String): Use um dos valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática".</li>
-                    <li><code>enunciado</code> (String): O texto completo da pergunta.</li>
-                    <li><code>imagem</code> (String): A URL para uma imagem. Se não houver, deixe como uma string vazia: <code>""</code>.</li>
-                    <li><code>alternativas</code> (Array): Uma lista com <strong>exatamente 5 objetos</strong>, cada um com <code>"letra"</code> (A, B, C, D, E) e <code>"texto"</code>.</li>
-                    <li><code>respostaCorreta</code> (String): <strong>Apenas a letra maiúscula</strong> da resposta correta. Ex: "D".</li>
-                </ul>
-            </div>
+            <div class="overflow-y-auto pr-4">
+                <p class="mb-4" style="color: var(--text-secondary);">Para garantir que as questões sejam carregadas corretamente, especialmente ao usar uma IA, siga esta estrutura <strong class="text-red-400">RIGOROSAMENTE</strong>. Qualquer desvio pode causar erros.</p>
+                
+                <div class="text-left space-y-2 mb-4 text-sm" style="color: var(--text-secondary);">
+                    <p>O arquivo deve ser um <strong>Array</strong> (iniciando com <code>[</code> e terminando com <code>]</code>) contendo múltiplos <strong>Objetos</strong> de questão (entre <code>{</code> e <code>}</code>).</p>
+                    <p><strong>Estrutura de cada Objeto de Questão:</strong></p>
+                    <ul class="list-disc list-inside space-y-1 pl-4">
+                        <li><code>id</code> (String): Identificador único. Ex: "ENEM 2023 - Q91".</li>
+                        <li><code>area</code> (String): Use um dos valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática".</li>
+                        <li><code>enunciado</code> (String): O texto completo da pergunta.</li>
+                        <li><code>imagem</code> (String): A URL para uma imagem. Se não houver, deixe como uma string vazia: <code>""</code>.</li>
+                        <li><code>alternativas</code> (Array): Uma lista com <strong>exatamente 5 objetos</strong>, cada um com <code>"letra"</code> (A, B, C, D, E) e <code>"texto"</code>.</li>
+                        <li><code>respostaCorreta</code> (String): <strong>Apenas a letra maiúscula</strong> da resposta correta. Ex: "D".</li>
+                    </ul>
+                </div>
 
-            <div class="rounded-lg p-4 text-sm overflow-x-auto border" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                <div id="json-example-container" class="rounded-lg p-4 text-sm overflow-x-auto border" style="background-color: var(--bg-primary); border-color: var(--border-color);">
 <pre><code class="language-json" style="color: var(--text-secondary);">
 [
   {
@@ -274,9 +276,19 @@
   }
 ]
 </code></pre>
+                </div>
+            </div>
+            <div class="mt-4 flex-shrink-0">
+                <button id="copy-json-prompt-btn" class="w-full text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md flex items-center justify-center" style="background-color: var(--button-primary-bg);">
+                    <i data-feather="copy" class="w-4 h-4 mr-2"></i>
+                    Copiar Prompt para IA
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Elemento oculto para a cópia -->
+    <textarea id="json-prompt-to-copy" class="absolute -left-full"></textarea>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -325,6 +337,8 @@
         const closeModalBtn = document.getElementById('close-modal-btn');
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
+        const copyJsonPromptBtn = document.getElementById('copy-json-prompt-btn');
+        const jsonPromptToCopy = document.getElementById('json-prompt-to-copy');
 
         // --- FUNÇÕES DE TEMA ---
         const applyTheme = (theme) => {
@@ -408,6 +422,45 @@
             }
             return false;
         }
+        
+        const handleCopyJsonPrompt = () => {
+            const exampleCode = document.querySelector('#json-example-container pre code').innerText;
+            const promptText = `Você é um especialista em criar questões para o ENEM. Crie um conjunto de 10 questões no formato JSON, seguindo ESTRITAMENTE a estrutura abaixo. Não adicione comentários, explicações ou qualquer texto fora do array JSON. O resultado final deve ser apenas o código JSON puro.
+
+Estrutura:
+- O arquivo DEVE ser um Array (iniciando com [ e terminando com ]).
+- Cada item no array é um Objeto de questão (entre { e }).
+- Cada objeto DEVE conter as seguintes chaves:
+  - "id": String (Ex: "ENEM 2023 - Q91")
+  - "area": String (Use um destes valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática")
+  - "enunciado": String (O texto completo da pergunta)
+  - "imagem": String (A URL para uma imagem. Se não houver, deixe como uma string vazia: "")
+  - "alternativas": Array com EXATAMENTE 5 objetos, cada um com "letra" (A, B, C, D, E) e "texto".
+  - "respostaCorreta": String (APENAS a letra maiúscula da resposta correta. Ex: "D")
+
+Exemplo de uma questão no formato correto:
+${exampleCode}
+`;
+            jsonPromptToCopy.value = promptText;
+            jsonPromptToCopy.select();
+            jsonPromptToCopy.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                document.execCommand('copy');
+                const originalText = copyJsonPromptBtn.innerHTML;
+                copyJsonPromptBtn.innerHTML = `
+                    <i data-feather="check" class="w-4 h-4 mr-2"></i>
+                    Copiado!
+                `;
+                feather.replace();
+                setTimeout(() => {
+                    copyJsonPromptBtn.innerHTML = originalText;
+                    feather.replace();
+                }, 2000);
+            } catch (err) {
+                alert('Não foi possível copiar o texto.');
+            }
+        };
 
         const init = async () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -623,6 +676,7 @@
             themeToggle.addEventListener('click', toggleTheme);
             jsonUpload.addEventListener('change', handleFileUpload);
             loadFromPasteBtn.addEventListener('click', handlePasteLoad);
+            copyJsonPromptBtn.addEventListener('click', handleCopyJsonPrompt);
             startQuizBtn.addEventListener('click', startQuiz);
             nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
             finishQuizBtn.addEventListener('click', showStats);
