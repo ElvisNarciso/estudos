@@ -221,22 +221,56 @@
     
     <!-- MODAL DE INSTRUÇÕES JSON -->
     <div id="json-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
-        <div class="rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative legendary-card">
+        <div class="rounded-2xl shadow-2xl max-w-3xl w-full p-8 relative legendary-card">
             <button id="close-modal-btn" class="absolute top-4 right-4 z-10" style="color: var(--text-secondary);">
                 <i data-feather="x" class="w-8 h-8"></i>
             </button>
-            <h3 class="text-3xl font-bold mb-4 text-yellow-400">Como Criar seu Arquivo JSON</h3>
-            <p class="mb-4" style="color: var(--text-secondary);">O arquivo deve ser um array de objetos, onde cada objeto representa uma questão.</p>
+            <h3 class="text-3xl font-bold mb-4 text-yellow-400">Instruções para o JSON</h3>
+            <p class="mb-4" style="color: var(--text-secondary);">Para garantir que as questões sejam carregadas corretamente, especialmente ao usar uma IA, siga esta estrutura <strong class="text-red-400">RIGOROSAMENTE</strong>. Qualquer desvio pode causar erros.</p>
+            
+            <div class="text-left space-y-2 mb-4 text-sm" style="color: var(--text-secondary);">
+                <p>O arquivo deve ser um <strong>Array</strong> (iniciando com <code>[</code> e terminando com <code>]</code>) contendo múltiplos <strong>Objetos</strong> de questão (entre <code>{</code> e <code>}</code>).</p>
+                <p><strong>Estrutura de cada Objeto de Questão:</strong></p>
+                <ul class="list-disc list-inside space-y-1 pl-4">
+                    <li><code>id</code> (String): Identificador único. Ex: "ENEM 2023 - Q91".</li>
+                    <li><code>area</code> (String): Use um dos valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática".</li>
+                    <li><code>enunciado</code> (String): O texto completo da pergunta.</li>
+                    <li><code>imagem</code> (String): A URL para uma imagem. Se não houver, deixe como uma string vazia: <code>""</code>.</li>
+                    <li><code>alternativas</code> (Array): Uma lista com <strong>exatamente 5 objetos</strong>, cada um com <code>"letra"</code> (A, B, C, D, E) e <code>"texto"</code>.</li>
+                    <li><code>respostaCorreta</code> (String): <strong>Apenas a letra maiúscula</strong> da resposta correta. Ex: "D".</li>
+                </ul>
+            </div>
+
             <div class="rounded-lg p-4 text-sm overflow-x-auto border" style="background-color: var(--bg-primary); border-color: var(--border-color);">
 <pre><code class="language-json" style="color: var(--text-secondary);">
 [
   {
     "id": "ENEM 2023 - Q91",
     "area": "Ciências da Natureza",
-    "enunciado": "...",
+    "enunciado": "O veneno de serpentes do gênero Bothrops (jararacas) e Crotalus (cascavéis) apresenta diferentes componentes tóxicos que atuam no organismo da pessoa acidentada. Os componentes do veneno de Bothrops causam principalmente reações locais, como dor, inchaço e vermelhidão, podendo evoluir para hemorragia e necrose do tecido. Já o veneno de Crotalus tem ação neurotóxica, sistêmica, que interfere na comunicação entre os neurônios, podendo levar à paralisia muscular.",
     "imagem": "",
-    "alternativas": [...],
+    "alternativas": [
+      { "letra": "A", "texto": "o soro antibotrópico é capaz de neutralizar a ação neurotóxica do veneno de Crotalus." },
+      { "letra": "B", "texto": "o soro anticrotálico é eficaz contra a peçonha de Bothrops, prevenindo a necrose tecidual." },
+      { "letra": "C", "texto": "os dois tipos de soro contêm os mesmos anticorpos, sendo intercambiáveis." },
+      { "letra": "D", "texto": "o soro antibotrópico contém anticorpos que neutralizam as toxinas do veneno de Bothrops." },
+      { "letra": "E", "texto": "a produção de ambos os soros dispensa o uso de veneno, sendo feita por engenharia genética." }
+    ],
     "respostaCorreta": "D"
+  },
+  {
+    "id": "ENEM 2022 - Q138",
+    "area": "Matemática",
+    "enunciado": "Uma pessoa precisa comprar 15 sacos de cimento para uma reforma. Ela faz uma pesquisa de preços em três depósitos que vendem o saco de cimento de 50 kg, conforme a tabela. Além disso, para qualquer quantidade de sacos, o frete é de R$ 1,00 por quilômetro de distância do depósito à sua casa. Ela escolherá o depósito que resultará no menor custo total (cimento mais frete).",
+    "imagem": "https://placehold.co/600x200/eab308/111827?text=Exemplo+de+Tabela+aqui",
+    "alternativas": [
+      { "letra": "A", "texto": "Depósito I, com custo total de R$ 405,00." },
+      { "letra": "B", "texto": "Depósito II, com custo total de R$ 420,00." },
+      { "letra": "C", "texto": "Depósito III, com custo total de R$ 435,00." },
+      { "letra": "D", "texto": "Depósito I, com custo total de R$ 450,00." },
+      { "letra": "E", "texto": "Depósito II, com custo total de R$ 390,00." }
+    ],
+    "respostaCorreta": "E"
   }
 ]
 </code></pre>
