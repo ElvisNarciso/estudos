@@ -15,104 +15,41 @@
     
     <!-- Ícones (Feather Icons) -->
     <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Biblioteca de Confetes -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- Sistema de Temas com Variáveis CSS --- */
         :root {
-            --bg-primary: #f0f9ff; /* Azul muito claro */
-            --bg-secondary: #e0f2fe; /* Azul claro */
-            --card-bg: linear-gradient(145deg, #ffffff, #f7fafc);
-            --text-primary: #0c4a6e; /* Azul escuro */
-            --text-secondary: #374151; /* Cinza */
-            --text-accent: #4f46e5; /* Indigo */
-            --border-color: #e5e7eb;
-            --button-primary-bg: #4f46e5;
-            --button-primary-hover: #4338ca;
+            --bg-primary: #f0f9ff; --bg-secondary: #e0f2fe; --card-bg: linear-gradient(145deg, #ffffff, #f7fafc);
+            --text-primary: #0c4a6e; --text-secondary: #374151; --text-accent: #4f46e5;
+            --border-color: #e5e7eb; --button-primary-bg: #4f46e5; --button-primary-hover: #4338ca;
             --legendary-border-gradient: linear-gradient(120deg, #f59e0b, #ef4444, #8b5cf6, #3b82f6, #f59e0b);
-            --legendary-card-bg: white;
         }
-
         .dark {
-            --bg-primary: #111827; /* Cinza muito escuro */
-            --bg-secondary: #0f172a; /* Azul noite */
-            --card-bg: linear-gradient(145deg, #1f2937, #111827);
-            --text-primary: #e5e7eb; /* Cinza claro */
-            --text-secondary: #9ca3af; /* Cinza */
-            --text-accent: #818cf8; /* Indigo claro */
-            --border-color: #374151;
-            --button-primary-bg: #6366f1;
-            --button-primary-hover: #4f46e5;
-            --legendary-border-gradient: linear-gradient(120deg, #f59e0b, #ef4444, #8b5cf6, #3b82f6, #f59e0b);
-            --legendary-card-bg: #1f2937;
+            --bg-primary: #111827; --bg-secondary: #0f172a; --card-bg: linear-gradient(145deg, #1f2937, #111827);
+            --text-primary: #e5e7eb; --text-secondary: #9ca3af; --text-accent: #818cf8;
+            --border-color: #374151; --button-primary-bg: #6366f1; --button-primary-hover: #4f46e5;
         }
-        /* --- FIM DO SISTEMA DE TEMAS --- */
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        .main-container {
-            background: var(--bg-secondary);
-            transition: background-color 0.3s ease;
-        }
-
-        .legendary-card {
-            border: 3px solid transparent;
-            background: var(--card-bg) padding-box, var(--legendary-border-gradient) border-box;
-            background-size: 200% 200%;
-            animation: gradient-border-animation 4s linear infinite;
-            transition: background 0.3s ease;
-        }
-
-        @keyframes gradient-border-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .alternative-btn {
-            background-color: color-mix(in srgb, var(--card-bg), transparent 50%);
-            border: 2px solid var(--border-color);
-            color: var(--text-secondary);
-            transition: all 0.2s ease-in-out;
-        }
-        .alternative-btn:hover {
-            transform: translateY(-2px);
-            border-color: var(--text-accent);
-        }
-        .alternative-btn.correct {
-            background-color: #166534; color: white; border-color: #22c55e;
-        }
-        .alternative-btn.incorrect {
-            background-color: #991b1b; color: white; border-color: #ef4444;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
+        .main-container { background: var(--bg-secondary); transition: background-color 0.3s ease; }
+        .legendary-card { border: 3px solid transparent; background: var(--card-bg) padding-box, var(--legendary-border-gradient) border-box; background-size: 200% 200%; animation: gradient-border-animation 4s linear infinite; transition: background 0.3s ease; }
+        @keyframes gradient-border-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .alternative-btn { background-color: color-mix(in srgb, var(--card-bg), transparent 50%); border: 2px solid var(--border-color); color: var(--text-secondary); transition: all 0.2s ease-in-out; }
+        .alternative-btn:hover { transform: translateY(-2px); border-color: var(--text-accent); }
+        .alternative-btn.correct { background-color: #166534; color: white; border-color: #22c55e; }
+        .alternative-btn.incorrect { background-color: #991b1b; color: white; border-color: #ef4444; }
         .alternative-btn[disabled] { cursor: not-allowed; opacity: 0.7; }
-        
         .screen { display: none; animation: fadeIn 0.5s ease; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .modal-backdrop { background-color: rgba(0,0,0,0.8); }
-        
         .review-filter-btn.active-filter { background-color: var(--button-primary-bg); color: white; }
-        
-        #theme-toggle {
-            background: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        textarea {
-            background-color: color-mix(in srgb, var(--bg-primary), #000 2%);
-            border-color: var(--border-color);
-            color: var(--text-secondary);
-        }
+        #theme-toggle { background: var(--border-color); color: var(--text-primary); }
+        textarea { background-color: color-mix(in srgb, var(--bg-primary), #000 2%); border-color: var(--border-color); color: var(--text-secondary); }
     </style>
 </head>
 <body>
-    <!-- Botão de Tema Fixo -->
     <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full shadow-lg">
         <i id="theme-icon" data-feather="moon"></i>
     </button>
@@ -123,50 +60,40 @@
         <div id="home-screen" class="screen active text-center p-8 rounded-2xl shadow-2xl max-w-2xl w-full legendary-card">
             <h1 class="text-5xl font-black mb-2" style="color: var(--text-primary);">ENEM Power-Up</h1>
             <p class="text-xl mb-8 opacity-90" style="color: var(--text-secondary);">Sua jornada para a aprovação começa agora!</p>
-            
             <div class="space-y-4">
-                <button id="start-quiz-btn" class="w-full text-white font-bold py-4 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style="background-color: var(--button-primary-bg);">
-                    Iniciar Novo Quiz
-                </button>
+                <button id="start-quiz-btn" class="w-full text-white font-bold py-4 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" style="background-color: var(--button-primary-bg);">Iniciar Novo Quiz</button>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button id="stats-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Estatísticas</button>
+                    <button id="stats-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Estatísticas Gerais</button>
                     <button id="review-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Revisar Questões</button>
                 </div>
             </div>
-
             <div class="mt-8 border-t-2 pt-6" style="border-color: var(--border-color);">
                 <label for="json-upload" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Carregar arquivo JSON:</label>
                 <input type="file" id="json-upload" accept=".json" class="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold cursor-pointer" style="color: var(--text-secondary);"/>
                 <p id="file-status" class="text-sm mt-2" style="color: var(--text-secondary);">Nenhum arquivo carregado.</p>
-                
                 <div class="my-4 text-center text-sm" style="color: var(--text-secondary);">ou</div>
-
                 <label for="json-paste-area" class="block mb-2 font-semibold text-lg" style="color: var(--text-primary);">Cole o código JSON aqui:</label>
                 <textarea id="json-paste-area" rows="4" class="w-full p-2 border rounded-md text-sm" placeholder="[ { ... } ]"></textarea>
                 <button id="load-from-paste-btn" class="w-full mt-2 text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md" style="background-color: var(--button-primary-bg);">Carregar do Texto</button>
-
                 <button id="how-to-json-btn" class="mt-6 text-sm underline" style="color: var(--text-accent);">Como formatar o arquivo JSON?</button>
             </div>
         </div>
 
         <!-- TELA DO QUIZ -->
         <div id="quiz-screen" class="screen p-6 md:p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
-             <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
-                <i data-feather="x-circle" class="w-7 h-7"></i>
-            </button>
+             <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);"><i data-feather="x-circle" class="w-7 h-7"></i></button>
              <div class="flex justify-between items-center mb-4">
-                <div>
+                <div class="flex items-center space-x-4">
                     <span id="question-counter" class="font-bold text-lg" style="color: var(--text-primary);"></span>
-                    <span id="question-area" class="ml-4 text-white px-3 py-1 text-sm font-semibold rounded-full" style="background-color: var(--button-primary-bg);"></span>
+                    <span id="question-area" class="text-white px-3 py-1 text-sm font-semibold rounded-full" style="background-color: var(--button-primary-bg);"></span>
                 </div>
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-4">
+                    <span id="streak-counter" class="font-bold text-xl text-orange-500"></span>
                     <i data-feather="award" class="w-6 h-6 text-yellow-400"></i>
                     <span id="score" class="font-bold text-2xl" style="color: var(--text-primary);">0</span>
                 </div>
             </div>
-            <div class="w-full rounded-full h-2.5 mb-6" style="background-color: var(--border-color);">
-                <div id="progress-bar" class="bg-yellow-500 h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
+            <div class="w-full rounded-full h-2.5 mb-6" style="background-color: var(--border-color);"><div id="progress-bar" class="bg-yellow-500 h-2.5 rounded-full" style="width: 0%"></div></div>
             <div id="question-container" class="mb-6">
                 <p id="question-id" class="font-semibold text-sm mb-2" style="color: var(--text-secondary);"></p>
                 <p id="question-text" class="text-lg leading-relaxed" style="color: var(--text-primary);"></p>
@@ -175,40 +102,42 @@
             <div id="alternatives-container" class="grid grid-cols-1 gap-3"></div>
             <div class="mt-6 text-center">
                 <div id="feedback-message" class="h-8 mb-4 font-bold text-xl"></div>
-                <!-- NOVO: Container para resolução -->
                 <div id="resolution-container" class="mt-4 text-left hidden">
-                    <button id="toggle-resolution-btn" class="w-full md:w-auto text-sm font-semibold py-2 px-4 rounded-lg shadow-md flex items-center justify-center mx-auto" style="background-color: var(--border-color); color: var(--text-secondary);">
-                        <i data-feather="eye" class="w-4 h-4 mr-2"></i>
-                        Ver Resolução
-                    </button>
-                    <div id="resolution-content" class="mt-4 p-4 rounded-lg text-sm hidden" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%); border-left: 4px solid var(--text-accent);">
-                        <!-- O texto da resolução será inserido aqui -->
-                    </div>
+                    <button id="toggle-resolution-btn" class="w-full md:w-auto text-sm font-semibold py-2 px-4 rounded-lg shadow-md flex items-center justify-center mx-auto" style="background-color: var(--border-color); color: var(--text-secondary);"><i data-feather="eye" class="w-4 h-4 mr-2"></i>Ver Resolução</button>
+                    <div id="resolution-content" class="mt-4 p-4 rounded-lg text-sm hidden" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%); border-left: 4px solid var(--text-accent);"></div>
                 </div>
                 <button id="next-question-btn" class="w-full md:w-1/2 text-white font-bold py-3 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg hidden mt-4" style="background-color: var(--button-primary-bg);">Próxima Questão</button>
                 <button id="finish-quiz-btn" class="w-full md:w-1/2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-transform transform hover:scale-105 shadow-lg hidden mt-4">Finalizar e Ver Resultados</button>
             </div>
         </div>
 
+        <!-- TELA DE RESULTADOS DO QUIZ -->
+        <div id="results-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-3xl w-full legendary-card relative text-center">
+            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);"><i data-feather="x-circle" class="w-7 h-7"></i></button>
+            <h2 class="text-4xl font-black mb-2" style="color: var(--text-primary);">Quiz Finalizado!</h2>
+            <p id="motivational-message" class="text-lg mb-6" style="color: var(--text-secondary);"></p>
+            <div class="mb-6">
+                <span class="text-2xl font-semibold" style="color: var(--text-secondary);">Sua pontuação:</span>
+                <span id="final-score" class="text-6xl font-bold ml-2" style="color: var(--text-accent);"></span>
+            </div>
+            <div id="study-suggestions-container" class="text-left bg-black/5 dark:bg-black/20 p-6 rounded-lg">
+                <h3 class="text-xl font-bold mb-3" style="color: var(--text-primary);">Pontos para Melhorar:</h3>
+                <ul id="study-suggestions-list" class="space-y-2 list-disc list-inside"></ul>
+            </div>
+             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="results-to-review-btn" class="w-full font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md" style="background-color: var(--border-color); color: var(--text-secondary);">Revisar Questões do Quiz</button>
+                <button id="results-to-home-btn" class="w-full text-white font-bold py-3 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-lg" style="background-color: var(--button-primary-bg);">Voltar ao Início</button>
+            </div>
+        </div>
+
         <!-- TELA DE ESTATÍSTICAS -->
         <div id="stats-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-3xl w-full legendary-card relative">
-            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
-                <i data-feather="x-circle" class="w-7 h-7"></i>
-            </button>
-            <h2 class="text-4xl font-black mb-6 text-center" style="color: var(--text-primary);">Suas Estatísticas</h2>
+            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);"><i data-feather="x-circle" class="w-7 h-7"></i></button>
+            <h2 class="text-4xl font-black mb-6 text-center" style="color: var(--text-primary);">Estatísticas Gerais</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center mb-8">
-                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
-                    <p class="text-4xl font-bold" id="stats-total-answered" style="color: var(--text-primary);">0</p>
-                    <p style="color: var(--text-secondary);">Questões Resolvidas</p>
-                </div>
-                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
-                    <p class="text-4xl font-bold text-green-500" id="stats-accuracy">0%</p>
-                    <p style="color: var(--text-secondary);">Acertos</p>
-                </div>
-                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
-                    <p class="text-4xl font-bold text-yellow-500" id="stats-streak">0</p>
-                    <p style="color: var(--text-secondary);">Sequência Atual</p>
-                </div>
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);"><p class="text-4xl font-bold" id="stats-total-answered" style="color: var(--text-primary);">0</p><p style="color: var(--text-secondary);">Questões Resolvidas</p></div>
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);"><p class="text-4xl font-bold text-green-500" id="stats-accuracy">0%</p><p style="color: var(--text-secondary);">Acertos</p></div>
+                <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);"><p class="text-4xl font-bold text-yellow-500" id="stats-streak">0</p><p style="color: var(--text-secondary);">Sequência Atual</p></div>
             </div>
             <h3 class="text-2xl font-bold mb-4 text-center" style="color: var(--text-primary);">Desempenho por Área</h3>
             <div id="area-stats-container" class="space-y-3"></div>
@@ -216,9 +145,7 @@
 
         <!-- TELA DE REVISÃO -->
         <div id="review-screen" class="screen p-8 rounded-2xl shadow-2xl max-w-4xl w-full legendary-card relative">
-            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);">
-                <i data-feather="x-circle" class="w-7 h-7"></i>
-            </button>
+            <button class="close-screen-btn absolute top-4 right-4 z-10 hover:opacity-80" style="color: var(--text-secondary);"><i data-feather="x-circle" class="w-7 h-7"></i></button>
             <h2 class="text-4xl font-black mb-6 text-center" style="color: var(--text-primary);">Revisão de Questões</h2>
             <div class="flex justify-center space-x-4 mb-6">
                 <button class="review-filter-btn" data-filter="all">Todas</button>
@@ -232,202 +159,125 @@
     <!-- MODAL DE INSTRUÇÕES JSON -->
     <div id="json-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal-backdrop">
         <div class="rounded-2xl shadow-2xl max-w-3xl w-full p-8 relative legendary-card flex flex-col max-h-[90vh]">
-            <button id="close-modal-btn" class="absolute top-4 right-4 z-10" style="color: var(--text-secondary);">
-                <i data-feather="x" class="w-8 h-8"></i>
-            </button>
+            <button id="close-modal-btn" class="absolute top-4 right-4 z-10" style="color: var(--text-secondary);"><i data-feather="x" class="w-8 h-8"></i></button>
             <h3 class="text-3xl font-bold mb-4 text-yellow-400 flex-shrink-0">Instruções para o JSON</h3>
-            
             <div class="overflow-y-auto pr-4">
-                <p class="mb-4" style="color: var(--text-secondary);">Para garantir que as questões sejam carregadas corretamente, especialmente ao usar uma IA, siga esta estrutura <strong class="text-red-400">RIGOROSAMENTE</strong>. Qualquer desvio pode causar erros.</p>
-                
+                <p class="mb-4" style="color: var(--text-secondary);">Para que a IA gere questões compatíveis com a análise de desempenho, use o prompt abaixo. A estrutura deve ser seguida <strong class="text-red-400">RIGOROSAMENTE</strong>.</p>
                 <div class="text-left space-y-2 mb-4 text-sm" style="color: var(--text-secondary);">
                     <p><strong>Estrutura de cada Objeto de Questão:</strong></p>
                     <ul class="list-disc list-inside space-y-1 pl-4">
                         <li><code>id</code> (String): Identificador único. Ex: "ENEM 2023 - Q91".</li>
                         <li><code>area</code> (String): Use um dos valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática".</li>
+                        <li><code>assunto</code> (String): **OBRIGATÓRIO.** O tópico específico da questão. Ex: "Logaritmos", "Revolução Industrial", "Interpretação de Texto", "Genética".</li>
                         <li><code>enunciado</code> (String): O texto completo da pergunta.</li>
-                        <li><code>imagem</code> (String): A URL para uma imagem. Se não houver, deixe como uma string vazia: <code>""</code>.</li>
-                        <li><code>alternativas</code> (Array): Uma lista com <strong>exatamente 5 objetos</strong>, cada um com <code>"letra"</code> (A, B, C, D, E) e <code>"texto"</code>.</li>
+                        <li><code>imagem</code> (String): URL para uma imagem. Se não houver, deixe como string vazia: <code>""</code>.</li>
+                        <li><code>alternativas</code> (Array): Lista com <strong>exatamente 5 objetos</strong>, cada um com <code>"letra"</code> (A, B, C, D, E) e <code>"texto"</code>.</li>
                         <li><code>respostaCorreta</code> (String): <strong>Apenas a letra maiúscula</strong> da resposta correta. Ex: "D".</li>
                         <li><code>resolucao</code> (String): (Opcional) Texto com a explicação detalhada da resposta. Se não houver, deixe como string vazia: <code>""</code>.</li>
                     </ul>
                 </div>
-
                 <div id="json-example-container" class="rounded-lg p-4 text-sm overflow-x-auto border" style="background-color: var(--bg-primary); border-color: var(--border-color);">
 <pre><code class="language-json" style="color: var(--text-secondary);">
 [
   {
-    "id": "ENEM 2023 - Q91",
-    "area": "Ciências da Natureza",
-    "enunciado": "O veneno de serpentes do gênero Bothrops (jararacas) e Crotalus (cascavéis) apresenta diferentes componentes tóxicos que atuam no organismo da pessoa acidentada...",
+    "id": "ENEM 2021 - Q140",
+    "area": "Matemática",
+    "assunto": "Logaritmos",
+    "enunciado": "A Escala de Magnitude de Momento (abreviada como MMS e denotada como Mw), introduzida em 1979, substituiu a Escala Richter para medir a magnitude dos terremotos em termos de energia liberada. A Mw e a energia E (em joule) se relacionam pela fórmula: Mw = -10,7 + (2/3)log10(E). O terremoto de Kobe, no Japão, teve magnitude de 7,3 na escala Mw. Qual a ordem de grandeza da energia liberada?",
     "imagem": "",
     "alternativas": [
-      { "letra": "A", "texto": "o soro antibotrópico é capaz de neutralizar a ação neurotóxica do veneno de Crotalus." },
-      { "letra": "B", "texto": "o soro anticrotálico é eficaz contra a peçonha de Bothrops, prevenindo a necrose tecidual." },
-      { "letra": "C", "texto": "os dois tipos de soro contêm os mesmos anticorpos, sendo intercambiáveis." },
-      { "letra": "D", "texto": "o soro antibotrópico contém anticorpos que neutralizam as toxinas do veneno de Bothrops." },
-      { "letra": "E", "texto": "a produção de ambos os soros dispensa o uso de veneno, sendo feita por engenharia genética." }
-    ],
-    "respostaCorreta": "D",
-    "resolucao": "A resposta correta é a D, pois o soro antiofídico é produzido a partir do veneno da própria serpente. Ele contém anticorpos específicos que neutralizam as toxinas presentes no veneno para o qual foi fabricado. Portanto, o soro antibotrópico é específico para o veneno de Bothrops."
-  },
-  {
-    "id": "ENEM 2022 - Q138",
-    "area": "Matemática",
-    "enunciado": "Uma pessoa precisa comprar 15 sacos de cimento...",
-    "imagem": "https://placehold.co/600x200/eab308/111827?text=Exemplo+de+Tabela+aqui",
-    "alternativas": [
-      { "letra": "A", "texto": "Depósito I, com custo total de R$ 405,00." },
-      { "letra": "B", "texto": "Depósito II, com custo total de R$ 420,00." },
-      { "letra": "C", "texto": "Depósito III, com custo total de R$ 435,00." },
-      { "letra": "D", "texto": "Depósito I, com custo total de R$ 450,00." },
-      { "letra": "E", "texto": "Depósito II, com custo total de R$ 390,00." }
+      { "letra": "A", "texto": "10^15" },
+      { "letra": "B", "texto": "10^18" },
+      { "letra": "C", "texto": "10^21" },
+      { "letra": "D", "texto": "10^24" },
+      { "letra": "E", "texto": "10^27" }
     ],
     "respostaCorreta": "E",
-    "resolucao": "Cálculo do custo total para cada depósito (15 sacos de cimento + frete): Depósito I: (15 x 23) + (10 x 1) = 345 + 10 = R$ 355. Depósito II: (15 x 21) + (18 x 1) = 315 + 18 = R$ 333. Depósito III: (15 x 22) + (12 x 1) = 330 + 12 = R$ 342. O menor custo é no Depósito II, mas nenhuma alternativa corresponde ao valor. Verificando o enunciado novamente, notamos que as alternativas podem estar erradas. O objetivo é mostrar o cálculo."
+    "resolucao": "Substituindo Mw = 7,3 na fórmula: 7,3 = -10,7 + (2/3)log10(E). Somando 10,7 em ambos os lados: 18 = (2/3)log10(E). Multiplicando por 3/2: 18 * (3/2) = log10(E), o que resulta em 27 = log10(E). Pela definição de logaritmo, E = 10^27. A ordem de grandeza é 10^27."
   }
 ]
 </code></pre>
                 </div>
             </div>
             <div class="mt-4 flex-shrink-0">
-                <button id="copy-json-prompt-btn" class="w-full text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md flex items-center justify-center" style="background-color: var(--button-primary-bg);">
-                    <i data-feather="copy" class="w-4 h-4 mr-2"></i>
-                    Copiar Prompt para IA
-                </button>
+                <button id="copy-json-prompt-btn" class="w-full text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-md flex items-center justify-center" style="background-color: var(--button-primary-bg);"><i data-feather="copy" class="w-4 h-4 mr-2"></i>Copiar Prompt para IA</button>
             </div>
         </div>
     </div>
 
-    <!-- Elemento oculto para a cópia -->
     <textarea id="json-prompt-to-copy" class="absolute -left-full"></textarea>
 
-    <!-- Firebase SDK -->
     <script type="module">
-        // Importações do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- CONFIGURAÇÃO FIREBASE ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
         let app, auth, db, userId;
+        let allQuestions = [], currentQuizQuestions = [], userHistory = [];
+        let currentQuestionIndex = 0, score = 0, streak = 0, quizWrongSubjects = [];
 
-        // --- VARIÁVEIS GLOBAIS DO APP ---
-        let allQuestions = [];
-        let currentQuizQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let streak = 0;
-        let userHistory = [];
-
-        // --- SELETORES DE ELEMENTOS DOM ---
-        const screens = { home: document.getElementById('home-screen'), quiz: document.getElementById('quiz-screen'), stats: document.getElementById('stats-screen'), review: document.getElementById('review-screen') };
-        const startQuizBtn = document.getElementById('start-quiz-btn');
-        const jsonUpload = document.getElementById('json-upload');
-        const fileStatus = document.getElementById('file-status');
-        const jsonPasteArea = document.getElementById('json-paste-area');
-        const loadFromPasteBtn = document.getElementById('load-from-paste-btn');
-        const questionCounter = document.getElementById('question-counter');
-        const questionArea = document.getElementById('question-area');
-        const scoreDisplay = document.getElementById('score');
-        const progressBar = document.getElementById('progress-bar');
-        const questionId = document.getElementById('question-id');
-        const questionText = document.getElementById('question-text');
-        const questionImage = document.getElementById('question-image');
-        const alternativesContainer = document.getElementById('alternatives-container');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const resolutionContainer = document.getElementById('resolution-container');
-        const toggleResolutionBtn = document.getElementById('toggle-resolution-btn');
-        const resolutionContent = document.getElementById('resolution-content');
-        const nextQuestionBtn = document.getElementById('next-question-btn');
-        const finishQuizBtn = document.getElementById('finish-quiz-btn');
-        const statsBtn = document.getElementById('stats-btn');
-        const reviewBtn = document.getElementById('review-btn');
-        const closeScreenBtns = document.querySelectorAll('.close-screen-btn');
-        const jsonModal = document.getElementById('json-modal');
-        const howToJsonBtn = document.getElementById('how-to-json-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const copyJsonPromptBtn = document.getElementById('copy-json-prompt-btn');
-        const jsonPromptToCopy = document.getElementById('json-prompt-to-copy');
-
-        // --- FUNÇÕES DE TEMA ---
+        const screens = { home: document.getElementById('home-screen'), quiz: document.getElementById('quiz-screen'), stats: document.getElementById('stats-screen'), review: document.getElementById('review-screen'), results: document.getElementById('results-screen') };
+        const dom = {
+            startQuizBtn: document.getElementById('start-quiz-btn'), jsonUpload: document.getElementById('json-upload'), fileStatus: document.getElementById('file-status'),
+            jsonPasteArea: document.getElementById('json-paste-area'), loadFromPasteBtn: document.getElementById('load-from-paste-btn'), questionCounter: document.getElementById('question-counter'),
+            questionArea: document.getElementById('question-area'), scoreDisplay: document.getElementById('score'), progressBar: document.getElementById('progress-bar'),
+            questionId: document.getElementById('question-id'), questionText: document.getElementById('question-text'), questionImage: document.getElementById('question-image'),
+            alternativesContainer: document.getElementById('alternatives-container'), feedbackMessage: document.getElementById('feedback-message'), resolutionContainer: document.getElementById('resolution-container'),
+            toggleResolutionBtn: document.getElementById('toggle-resolution-btn'), resolutionContent: document.getElementById('resolution-content'), nextQuestionBtn: document.getElementById('next-question-btn'),
+            finishQuizBtn: document.getElementById('finish-quiz-btn'), statsBtn: document.getElementById('stats-btn'), reviewBtn: document.getElementById('review-btn'),
+            closeScreenBtns: document.querySelectorAll('.close-screen-btn'), jsonModal: document.getElementById('json-modal'), howToJsonBtn: document.getElementById('how-to-json-btn'),
+            closeModalBtn: document.getElementById('close-modal-btn'), themeToggle: document.getElementById('theme-toggle'), themeIcon: document.getElementById('theme-icon'),
+            copyJsonPromptBtn: document.getElementById('copy-json-prompt-btn'), jsonPromptToCopy: document.getElementById('json-prompt-to-copy'), streakCounter: document.getElementById('streak-counter'),
+            finalScore: document.getElementById('final-score'), motivationalMessage: document.getElementById('motivational-message'), studySuggestionsList: document.getElementById('study-suggestions-list'),
+            resultsToReviewBtn: document.getElementById('results-to-review-btn'), resultsToHomeBtn: document.getElementById('results-to-home-btn')
+        };
+        
         const applyTheme = (theme) => {
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                themeIcon.setAttribute('data-feather', 'sun');
-            } else {
-                document.documentElement.classList.remove('dark');
-                themeIcon.setAttribute('data-feather', 'moon');
-            }
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            dom.themeIcon.setAttribute('data-feather', theme === 'dark' ? 'sun' : 'moon');
             feather.replace();
         };
 
         const toggleTheme = () => {
-            const currentTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-            localStorage.setItem('theme', currentTheme);
-            applyTheme(currentTheme);
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
         };
 
-        // --- FUNÇÕES DE DADOS (FIREBASE) ---
         async function initializeFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                
-                return new Promise((resolve) => {
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            await loadUserHistory();
-                            resolve();
-                        } else {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                try { await signInWithCustomToken(auth, __initial_auth_token); } catch (error) { await signInAnonymously(auth); }
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        }
-                    });
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        await loadUserHistory();
+                    } else {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            try { await signInWithCustomToken(auth, __initial_auth_token); } catch (e) { await signInAnonymously(auth); }
+                        } else { await signInAnonymously(auth); }
+                    }
                 });
-            } catch (error) {
-                console.error("Erro ao inicializar o Firebase:", error);
-                userId = 'local';
-                loadUserHistory();
-            }
+            } catch (e) { userId = 'local'; loadUserHistory(); }
         }
 
         async function loadUserHistory() {
             if (!userId) return;
-            if (userId === 'local') {
-                userHistory = JSON.parse(localStorage.getItem('enemUserHistory_local')) || [];
-                return;
-            }
-            const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/history`);
-            const querySnapshot = await getDocs(query(historyCollection));
-            userHistory = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            if (userId === 'local') { userHistory = JSON.parse(localStorage.getItem('enemUserHistory_local')) || []; return; }
+            const q = query(collection(db, `artifacts/${appId}/users/${userId}/history`));
+            const snapshot = await getDocs(q);
+            userHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         }
 
         async function saveAnswerToHistory(answerData) {
             userHistory.push(answerData);
-            if (!userId || userId === 'local') {
-                localStorage.setItem('enemUserHistory_local', JSON.stringify(userHistory));
-                return;
-            }
-            try {
-                const historyCollection = collection(db, `artifacts/${appId}/users/${userId}/history`);
-                await addDoc(historyCollection, answerData);
-            } catch (error) {
-                console.error("Erro ao salvar resposta no Firestore:", error);
-            }
+            if (!userId || userId === 'local') { localStorage.setItem('enemUserHistory_local', JSON.stringify(userHistory)); return; }
+            try { await addDoc(collection(db, `artifacts/${appId}/users/${userId}/history`), answerData); } catch (e) { console.error("Erro ao salvar no Firestore:", e); }
         }
         
-        // --- FUNÇÕES DO APP ---
         const processAndLoadQuestions = (json) => {
             if (Array.isArray(json) && json.length > 0) {
                 allQuestions = json;
@@ -440,73 +290,51 @@
         
         const handleCopyJsonPrompt = () => {
             const exampleCode = document.querySelector('#json-example-container pre code').innerText;
-            const promptText = `Você é um especialista em criar questões para o ENEM. Crie um conjunto de 10 questões no formato JSON, seguindo ESTRITAMENTE a estrutura abaixo. Não adicione comentários, explicações ou qualquer texto fora do array JSON. O resultado final deve ser apenas o código JSON puro.
+            const promptText = `Crie um conjunto de 10 questões para o ENEM no formato JSON. Siga ESTRITAMENTE a estrutura e as regras abaixo. O resultado final deve ser apenas o código JSON puro, sem comentários ou explicações adicionais.
 
-Estrutura:
-- O arquivo DEVE ser um Array (iniciando com [ e terminando com ]).
-- Cada item no array é um Objeto de questão (entre { e }).
-- Cada objeto DEVE conter as seguintes chaves:
-  - "id": String (Ex: "ENEM 2023 - Q91")
-  - "area": String (Use um destes valores: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática")
-  - "enunciado": String (O texto completo da pergunta)
-  - "imagem": String (A URL para uma imagem. Se não houver, deixe como uma string vazia: "")
-  - "alternativas": Array com EXATAMENTE 5 objetos, cada um com "letra" (A, B, C, D, E) e "texto".
-  - "respostaCorreta": String (APENAS a letra maiúscula da resposta correta. Ex: "D")
-  - "resolucao": String (OPCIONAL. Texto com a explicação detalhada da resposta. Se não houver, pode deixar como string vazia: "")
+REGRAS E ESTRUTURA (para cada questão):
+1.  **id** (String): Identificador único. Ex: "ENEM 2021 - Q140".
+2.  **area** (String): Categoria principal. Use um destes: "Ciências da Natureza", "Ciências Humanas", "Linguagens", "Matemática".
+3.  **assunto** (String): Tópico específico da questão. Ex: "Logaritmos", "Revolução Industrial", "Genética", "Vanguardas Europeias". Este campo é OBRIGATÓRIO.
+4.  **enunciado** (String): O texto completo da pergunta, incluindo textos de apoio se houver.
+5.  **imagem** (String): URL de uma imagem de apoio. Se não houver, use uma string vazia: "".
+6.  **alternativas** (Array): Deve conter EXATAMENTE 5 objetos. Cada objeto deve ter "letra" (A, B, C, D, E) e "texto".
+7.  **respostaCorreta** (String): APENAS a letra maiúscula da alternativa correta. Ex: "A".
+8.  **resolucao** (String): (OPCIONAL) A explicação detalhada do porquê a resposta está correta. Se não tiver, use uma string vazia: "".
 
-Exemplo de uma questão no formato correto:
-${exampleCode}
-`;
-            jsonPromptToCopy.value = promptText;
-            jsonPromptToCopy.select();
-            jsonPromptToCopy.setSelectionRange(0, 99999); // For mobile devices
-
+EXEMPLO DE CÓDIGO:
+${exampleCode}`;
+            dom.jsonPromptToCopy.value = promptText;
+            dom.jsonPromptToCopy.select();
+            dom.jsonPromptToCopy.setSelectionRange(0, 99999);
             try {
                 document.execCommand('copy');
-                const originalText = copyJsonPromptBtn.innerHTML;
-                copyJsonPromptBtn.innerHTML = `
-                    <i data-feather="check" class="w-4 h-4 mr-2"></i>
-                    Copiado!
-                `;
+                const originalText = dom.copyJsonPromptBtn.innerHTML;
+                dom.copyJsonPromptBtn.innerHTML = `<i data-feather="check" class="w-4 h-4 mr-2"></i> Copiado!`;
                 feather.replace();
-                setTimeout(() => {
-                    copyJsonPromptBtn.innerHTML = originalText;
-                    feather.replace();
-                }, 2000);
-            } catch (err) {
-                alert('Não foi possível copiar o texto.');
-            }
+                setTimeout(() => { dom.copyJsonPromptBtn.innerHTML = originalText; feather.replace(); }, 2000);
+            } catch (err) { alert('Não foi possível copiar o texto.'); }
         };
 
         const init = async () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
+            applyTheme(localStorage.getItem('theme') || 'light');
             await initializeFirebase();
             const storedQuestions = localStorage.getItem('enemQuestions');
-            if(storedQuestions) {
-                allQuestions = JSON.parse(storedQuestions);
-            }
+            if(storedQuestions) allQuestions = JSON.parse(storedQuestions);
             updateHomeUI();
             addEventListeners();
-            feather.replace();
         };
 
         const showScreen = (screenName) => {
             Object.values(screens).forEach(screen => screen.classList.remove('active'));
             screens[screenName].classList.add('active');
-            feather.replace(); // Garante que novos ícones (como o de fechar) sejam renderizados
+            feather.replace();
         };
 
         const updateHomeUI = () => {
-            if (allQuestions.length > 0) {
-                startQuizBtn.disabled = false;
-                fileStatus.textContent = `${allQuestions.length} questões carregadas. Pronto para começar!`;
-                fileStatus.style.color = '#22c55e';
-            } else {
-                startQuizBtn.disabled = true;
-                fileStatus.textContent = 'Nenhum arquivo carregado.';
-                fileStatus.style.color = 'var(--text-secondary)';
-            }
+            dom.startQuizBtn.disabled = allQuestions.length === 0;
+            dom.fileStatus.textContent = allQuestions.length > 0 ? `${allQuestions.length} questões carregadas. Pronto para começar!` : 'Nenhum arquivo carregado.';
+            dom.fileStatus.style.color = allQuestions.length > 0 ? '#22c55e' : 'var(--text-secondary)';
         };
 
         const handleFileUpload = (event) => {
@@ -516,72 +344,61 @@ ${exampleCode}
             reader.onload = (e) => {
                 try {
                     const json = JSON.parse(e.target.result);
-                    if (!processAndLoadQuestions(json)) {
-                         alert('Erro: O arquivo JSON está vazio ou em formato inválido.');
-                    }
+                    if (!processAndLoadQuestions(json)) alert('Erro: O arquivo JSON está vazio ou em formato inválido.');
                 } catch (error) { alert('Erro ao ler o arquivo JSON. Verifique o formato.'); }
             };
             reader.readAsText(file);
         };
 
         const handlePasteLoad = () => {
-            const jsonText = jsonPasteArea.value;
-            if (!jsonText.trim()) {
-                alert('Por favor, cole o código JSON na área de texto.');
-                return;
-            }
+            const jsonText = dom.jsonPasteArea.value;
+            if (!jsonText.trim()) { alert('Por favor, cole o código JSON na área de texto.'); return; }
             try {
                 const json = JSON.parse(jsonText);
                 if (processAndLoadQuestions(json)) {
-                    jsonPasteArea.value = ''; // Limpa a área após o sucesso
+                    dom.jsonPasteArea.value = '';
                     alert('Questões carregadas com sucesso a partir do texto!');
-                } else {
-                    alert('Erro: O JSON colado está vazio ou em formato inválido.');
-                }
-            } catch (error) {
-                alert('Erro de formato no JSON. Verifique o texto colado.');
-            }
+                } else alert('Erro: O JSON colado está vazio ou em formato inválido.');
+            } catch (error) { alert('Erro de formato no JSON. Verifique o texto colado.'); }
         };
 
         const startQuiz = () => {
             currentQuizQuestions = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
-            currentQuestionIndex = 0; score = 0; streak = 0;
+            currentQuestionIndex = 0; score = 0; streak = 0; quizWrongSubjects = [];
+            updateStreakCounter();
             displayQuestion();
             showScreen('quiz');
         };
 
+        const updateStreakCounter = () => {
+            dom.streakCounter.innerHTML = streak > 1 ? `${streak} <span class="text-xl">🔥</span>` : '';
+        };
+
         const displayQuestion = () => {
-            feedbackMessage.textContent = '';
-            nextQuestionBtn.classList.add('hidden');
-            finishQuizBtn.classList.add('hidden');
-            alternativesContainer.innerHTML = '';
-            resolutionContainer.classList.add('hidden');
-            resolutionContent.classList.add('hidden');
+            dom.feedbackMessage.textContent = '';
+            dom.nextQuestionBtn.classList.add('hidden');
+            dom.finishQuizBtn.classList.add('hidden');
+            dom.alternativesContainer.innerHTML = '';
+            dom.resolutionContainer.classList.add('hidden');
+            dom.resolutionContent.classList.add('hidden');
             
             const question = currentQuizQuestions[currentQuestionIndex];
-            const progress = ((currentQuestionIndex + 1) / currentQuizQuestions.length) * 100;
-
-            questionCounter.textContent = `Questão ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
-            scoreDisplay.textContent = score;
-            progressBar.style.width = `${progress}%`;
-            questionArea.textContent = question.area;
-            questionId.textContent = question.id;
-            questionText.textContent = question.enunciado;
-            
-            if (question.imagem && question.imagem.trim() !== "") {
-                questionImage.src = question.imagem;
-                questionImage.classList.remove('hidden');
-            } else {
-                questionImage.classList.add('hidden');
-            }
+            dom.questionCounter.textContent = `Questão ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}`;
+            dom.scoreDisplay.textContent = score;
+            dom.progressBar.style.width = `${((currentQuestionIndex + 1) / currentQuizQuestions.length) * 100}%`;
+            dom.questionArea.textContent = question.area;
+            dom.questionId.textContent = question.id;
+            dom.questionText.textContent = question.enunciado;
+            dom.questionImage.classList.toggle('hidden', !question.imagem || question.imagem.trim() === "");
+            if (question.imagem) dom.questionImage.src = question.imagem;
 
             question.alternativas.forEach(alt => {
                 const button = document.createElement('button');
                 button.className = 'alternative-btn w-full text-left p-4 rounded-lg font-semibold';
                 button.dataset.letra = alt.letra;
                 button.innerHTML = `<span class="font-bold mr-3" style="color: var(--text-accent);">${alt.letra})</span> ${alt.texto}`;
-                button.addEventListener('click', selectAnswer);
-                alternativesContainer.appendChild(button);
+                button.onclick = selectAnswer;
+                dom.alternativesContainer.appendChild(button);
             });
         };
 
@@ -589,62 +406,81 @@ ${exampleCode}
             const selectedButton = event.currentTarget;
             const selectedAnswer = selectedButton.dataset.letra;
             const question = currentQuizQuestions[currentQuestionIndex];
-            const correctAnswer = question.respostaCorreta;
-            const isCorrect = selectedAnswer === correctAnswer;
+            const isCorrect = selectedAnswer === question.respostaCorreta;
 
-            alternativesContainer.querySelectorAll('.alternative-btn').forEach(btn => btn.disabled = true);
-
-            const answerData = {
-                questionId: question.id, area: question.area, userAnswer: selectedAnswer,
-                correctAnswer: correctAnswer, isCorrect: isCorrect, timestamp: new Date().toISOString()
-            };
-            saveAnswerToHistory(answerData);
+            dom.alternativesContainer.querySelectorAll('.alternative-btn').forEach(btn => btn.disabled = true);
+            saveAnswerToHistory({ questionId: question.id, area: question.area, userAnswer: selectedAnswer, correctAnswer: question.respostaCorreta, isCorrect, timestamp: new Date().toISOString() });
 
             if (isCorrect) {
                 selectedButton.classList.add('correct');
-                feedbackMessage.textContent = 'Resposta Correta!';
-                feedbackMessage.style.color = '#4ade80';
+                dom.feedbackMessage.textContent = 'Resposta Correta!';
+                dom.feedbackMessage.style.color = '#4ade80';
                 score += 10; streak++;
             } else {
                 selectedButton.classList.add('incorrect');
-                feedbackMessage.textContent = `Incorreto! A resposta era ${correctAnswer}.`;
-                feedbackMessage.style.color = '#f87171';
+                dom.feedbackMessage.textContent = `Incorreto! A resposta era ${question.respostaCorreta}.`;
+                dom.feedbackMessage.style.color = '#f87171';
                 streak = 0;
-                const correctButton = alternativesContainer.querySelector(`[data-letra="${correctAnswer}"]`);
+                if (question.assunto) quizWrongSubjects.push(question.assunto);
+                const correctButton = dom.alternativesContainer.querySelector(`[data-letra="${question.respostaCorreta}"]`);
                 if(correctButton) correctButton.classList.add('correct');
             }
             
-            // Mostra o botão de resolução se houver uma
-            if (question.resolucao && question.resolucao.trim() !== "") {
-                resolutionContainer.classList.remove('hidden');
-                resolutionContent.innerHTML = question.resolucao;
+            if (question.resolucao) {
+                dom.resolutionContainer.classList.remove('hidden');
+                dom.resolutionContent.innerHTML = question.resolucao;
             }
 
-            scoreDisplay.textContent = score;
-            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-                nextQuestionBtn.classList.remove('hidden');
+            updateStreakCounter();
+            dom.scoreDisplay.textContent = score;
+            dom.nextQuestionBtn.classList.toggle('hidden', currentQuestionIndex >= currentQuizQuestions.length - 1);
+            dom.finishQuizBtn.classList.toggle('hidden', currentQuestionIndex < currentQuizQuestions.length - 1);
+        };
+
+        const showResults = () => {
+            const scorePercentage = (score / (currentQuizQuestions.length * 10)) * 100;
+            dom.finalScore.textContent = score;
+
+            if (scorePercentage >= 80) {
+                dom.motivationalMessage.textContent = "Excelente desempenho! Você está no caminho certo para a aprovação!";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else if (scorePercentage >= 50) {
+                dom.motivationalMessage.textContent = "Bom trabalho! Continue focado nos pontos de melhoria e você chegará lá.";
             } else {
-                finishQuizBtn.classList.remove('hidden');
+                dom.motivationalMessage.textContent = "Não desanime! Cada erro é uma oportunidade de aprender. Revise os tópicos e tente novamente.";
             }
+
+            const uniqueSubjects = [...new Set(quizWrongSubjects)];
+            dom.studySuggestionsList.innerHTML = '';
+            if (uniqueSubjects.length > 0) {
+                uniqueSubjects.forEach(subject => {
+                    const li = document.createElement('li');
+                    li.textContent = subject;
+                    li.className = "text-sm";
+                    li.style.color = 'var(--text-secondary)';
+                    dom.studySuggestionsList.appendChild(li);
+                });
+            } else {
+                dom.studySuggestionsList.innerHTML = `<li class="text-green-500 font-semibold">Parabéns! Você não errou nenhuma questão com assunto definido.</li>`;
+            }
+            showScreen('results');
         };
 
         const showStats = () => {
              if (userHistory.length === 0) { alert("Você ainda não respondeu nenhuma questão."); return; }
-             const totalAnswered = userHistory.length;
              const totalCorrect = userHistory.filter(h => h.isCorrect).length;
-             const accuracy = totalAnswered > 0 ? ((totalCorrect / totalAnswered) * 100).toFixed(1) : 0;
-             document.getElementById('stats-total-answered').textContent = totalAnswered;
-             document.getElementById('stats-accuracy').textContent = `${accuracy}%`;
+             dom.statsTotalAnswered.textContent = userHistory.length;
+             dom.statsAccuracy.textContent = `${userHistory.length > 0 ? ((totalCorrect / userHistory.length) * 100).toFixed(1) : 0}%`;
              
              let currentStreak = 0;
              for (let i = userHistory.length - 1; i >= 0; i--) {
-                 if (userHistory[i].isCorrect) { currentStreak++; } else { break; }
+                 if (userHistory[i].isCorrect) currentStreak++; else break;
              }
-             document.getElementById('stats-streak').textContent = currentStreak;
+             dom.statsStreak.textContent = currentStreak;
 
              const areaStats = {};
              userHistory.forEach(h => {
-                 if (!areaStats[h.area]) { areaStats[h.area] = { total: 0, correct: 0 }; }
+                 areaStats[h.area] = areaStats[h.area] || { total: 0, correct: 0 };
                  areaStats[h.area].total++;
                  if (h.isCorrect) areaStats[h.area].correct++;
              });
@@ -654,16 +490,7 @@ ${exampleCode}
              Object.keys(areaStats).sort().forEach(area => {
                  const stats = areaStats[area];
                  const areaAccuracy = stats.total > 0 ? ((stats.correct / stats.total) * 100).toFixed(0) : 0;
-                 areaContainer.innerHTML += `
-                    <div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold" style="color: var(--text-primary);">${area}</span>
-                            <span class="text-sm" style="color: var(--text-secondary);">${stats.correct}/${stats.total} (${areaAccuracy}%)</span>
-                        </div>
-                        <div class="w-full rounded-full h-2.5 mt-2" style="background-color: var(--border-color);">
-                            <div class="h-2.5 rounded-full" style="width: ${areaAccuracy}%; background-color: var(--button-primary-bg);"></div>
-                        </div>
-                    </div>`;
+                 areaContainer.innerHTML += `<div class="p-4 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);"><div class="flex justify-between items-center"><span class="font-bold" style="color: var(--text-primary);">${area}</span><span class="text-sm" style="color: var(--text-secondary);">${stats.correct}/${stats.total} (${areaAccuracy}%)</span></div><div class="w-full rounded-full h-2.5 mt-2" style="background-color: var(--border-color);"><div class="h-2.5 rounded-full" style="width: ${areaAccuracy}%; background-color: var(--button-primary-bg);"></div></div></div>`;
              });
              showScreen('stats');
         };
@@ -678,54 +505,34 @@ ${exampleCode}
              filteredHistory.forEach(h => {
                  const questionData = allQuestions.find(q => q.id === h.questionId);
                  if (!questionData) return;
-                 const alternativesHtml = questionData.alternativas.map(alt => {
-                     let classes = 'pl-8 py-1';
-                     if (alt.letra === h.correctAnswer) classes += ' text-green-400 font-bold';
-                     if (alt.letra === h.userAnswer && !h.isCorrect) classes += ' text-red-400 line-through';
-                     return `<li class="${classes}" style="color: var(--text-secondary);">${alt.letra}) ${alt.texto}</li>`;
-                 }).join('');
-
-                 const resolutionHtml = (questionData.resolucao && questionData.resolucao.trim() !== "") 
-                    ? `<div class="mt-4 p-3 rounded-lg text-sm" style="background-color: color-mix(in srgb, var(--bg-primary), #000 2%); border-left: 3px solid var(--text-accent);">
-                           <h4 class="font-bold mb-1" style="color: var(--text-primary);">Resolução:</h4>
-                           <p style="color: var(--text-secondary);">${questionData.resolucao}</p>
-                       </div>` 
-                    : '';
-
-                 reviewContainer.innerHTML += `
-                    <div class="p-5 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);">
-                        <p class="font-bold text-sm" style="color: var(--text-accent);">${questionData.id} - ${questionData.area}</p>
-                        <p class="my-2" style="color: var(--text-primary);">${questionData.enunciado}</p>
-                        <ul class="list-none mt-3 text-sm">${alternativesHtml}</ul>
-                        ${resolutionHtml}
-                        <p class="mt-3 text-xs" style="color: var(--text-secondary); opacity: 0.7;">Respondido em: ${new Date(h.timestamp).toLocaleString('pt-BR')}</p>
-                    </div>`;
+                 const alternativesHtml = questionData.alternativas.map(alt => `<li class="pl-8 py-1 ${alt.letra === h.correctAnswer ? 'text-green-400 font-bold' : ''} ${alt.letra === h.userAnswer && !h.isCorrect ? 'text-red-400 line-through' : ''}" style="color: var(--text-secondary);">${alt.letra}) ${alt.texto}</li>`).join('');
+                 const resolutionHtml = questionData.resolucao ? `<div class="mt-4 p-3 rounded-lg text-sm" style="background-color: color-mix(in srgb, var(--bg-primary), #000 2%); border-left: 3px solid var(--text-accent);"><h4 class="font-bold mb-1" style="color: var(--text-primary);">Resolução:</h4><p style="color: var(--text-secondary);">${questionData.resolucao}</p></div>` : '';
+                 reviewContainer.innerHTML += `<div class="p-5 rounded-lg" style="background-color: color-mix(in srgb, var(--card-bg), #000000 10%);"><p class="font-bold text-sm" style="color: var(--text-accent);">${questionData.id} - ${questionData.area}</p><p class="my-2" style="color: var(--text-primary);">${questionData.enunciado}</p><ul class="list-none mt-3 text-sm">${alternativesHtml}</ul>${resolutionHtml}<p class="mt-3 text-xs" style="color: var(--text-secondary); opacity: 0.7;">Respondido em: ${new Date(h.timestamp).toLocaleString('pt-BR')}</p></div>`;
              });
              document.querySelectorAll('.review-filter-btn').forEach(btn => btn.classList.toggle('active-filter', btn.dataset.filter === filter));
              showScreen('review');
         };
         
         const addEventListeners = () => {
-            themeToggle.addEventListener('click', toggleTheme);
-            jsonUpload.addEventListener('change', handleFileUpload);
-            loadFromPasteBtn.addEventListener('click', handlePasteLoad);
-            copyJsonPromptBtn.addEventListener('click', handleCopyJsonPrompt);
-            startQuizBtn.addEventListener('click', startQuiz);
-            toggleResolutionBtn.addEventListener('click', () => {
-                resolutionContent.classList.toggle('hidden');
-            });
-            nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
-            finishQuizBtn.addEventListener('click', showStats);
-            statsBtn.addEventListener('click', showStats);
-            reviewBtn.addEventListener('click', () => showReview());
+            dom.themeToggle.addEventListener('click', toggleTheme);
+            dom.jsonUpload.addEventListener('change', handleFileUpload);
+            dom.loadFromPasteBtn.addEventListener('click', handlePasteLoad);
+            dom.copyJsonPromptBtn.addEventListener('click', handleCopyJsonPrompt);
+            dom.startQuizBtn.addEventListener('click', startQuiz);
+            dom.toggleResolutionBtn.addEventListener('click', () => dom.resolutionContent.classList.toggle('hidden'));
+            dom.nextQuestionBtn.addEventListener('click', () => { currentQuestionIndex++; displayQuestion(); });
+            dom.finishQuizBtn.addEventListener('click', showResults);
+            dom.statsBtn.addEventListener('click', showStats);
+            dom.reviewBtn.addEventListener('click', () => showReview());
+            dom.resultsToReviewBtn.addEventListener('click', () => showReview());
+            dom.resultsToHomeBtn.addEventListener('click', () => showScreen('home'));
             document.querySelectorAll('.review-filter-btn').forEach(btn => btn.addEventListener('click', (e) => showReview(e.currentTarget.dataset.filter)));
-            closeScreenBtns.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
-            howToJsonBtn.addEventListener('click', () => jsonModal.style.display = 'flex');
-            closeModalBtn.addEventListener('click', () => jsonModal.style.display = 'none');
-            jsonModal.addEventListener('click', (e) => { if (e.target === jsonModal) jsonModal.style.display = 'none'; });
+            dom.closeScreenBtns.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
+            dom.howToJsonBtn.addEventListener('click', () => dom.jsonModal.style.display = 'flex');
+            dom.closeModalBtn.addEventListener('click', () => dom.jsonModal.style.display = 'none');
+            dom.jsonModal.addEventListener('click', (e) => { if (e.target === dom.jsonModal) dom.jsonModal.style.display = 'none'; });
         };
 
-        // --- INICIA O APP ---
         init();
     </script>
 </body>
